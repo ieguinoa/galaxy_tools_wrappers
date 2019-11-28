@@ -1,38 +1,36 @@
 <tool id="cctop" name="CCTop" version="0.1">
     <description>CCTop - CRISPR/Cas9 Target predictor</description>
     <requirements>
-        <package name="python" version="2.7.10"></package>
         <requirement type="package">bowtie</requirement>
     </requirements>
-    <command>
-    <![CDATA[
-    which python;
-    bowtie_bin=`which bowtie`;
-    bowtie_dir=`dirname \$bowtie_bin`;
-    #if $input_files.genome_source != 'built-in':
-        mkdir index;
-        bowtie-build -r -f $input_files.ownFile index/bowtie;
-    #end if
- 
-    $__tool_directory__/CCTop.py
-    --bowtie "\$bowtie_dir"
-    #if $input_files.genome_source == 'built-in':	
-        --index $input_files.genome.fields.path
-    #else:
-        --index index/bowtie
-    #end if
-	--pam $pam_type.value
-    --input $input_sequences 
-    --targetSize $target_size.value
+<command><![CDATA[
+which python;
+bowtie_bin=`which bowtie`;
+bowtie_dir=`dirname \$bowtie_bin`;
+#if $input_files.genome_source != 'built-in':
+    mkdir index;
+    bowtie-build -r -f $input_files.ownFile index/bowtie;
+#end if
 
-    ]]>
-    </command>
+$__tool_directory__/CCTop.py
+--bowtie "\$bowtie_dir"
+#if $input_files.genome_source == 'built-in':	
+    --index $input_files.genome.fields.path
+#else:
+    --index index/bowtie
+#end if
+--pam $pam_type.value
+--input $input_sequences 
+--targetSize $target_size.value
+--totalMM $totalMM
+]]></command>
+
     <inputs>
-      <conditional name="input_files">
-        <param name="genome_source" type="select" label="Select genome source">
-            <option value="built-in" selected="true">Use a built-in genome</option>
-            <option value="history">Use a genome from your history</option>
-         </param>
+        <conditional name="input_files">
+            <param name="genome_source" type="select" label="Select genome source">
+                <option value="built-in" selected="true">Use a built-in genome</option>
+                <option value="history">Use a genome from your history</option>
+            </param>
             <when value="built-in">
                 <param name="genome" type="select" label="Select a genome build" help="If the genome build of your interest is not listed contact your Galaxy admin">
                     <options from_data_table="bowtie_indexes"/>
@@ -41,10 +39,9 @@
             <when value="history">
                 <param name="ownFile" type="data" format="fasta" metadata_name="dbkey" label="Select genome file"  />
             </when>
-         </conditional>
-	<param name="input_sequences" type="data" format="fasta" label="Fasta file containing the sequence(s) to be scanned for sgRNA candidates"/>
-
-	<param name="pam_type" type="select" label="PAM type">
+        </conditional>
+        <param name="input_sequences" type="data" format="fasta" label="Fasta file containing the sequence(s) to be scanned for sgRNA candidates"/>
+        <param name="pam_type" type="select" label="PAM type">
             <option value="NGG" selected="true">NGG</option>
             <option value="NRG">NRG</option>
             <option value="TTTN">TTTN</option>
@@ -53,16 +50,23 @@
   	    <option value="NNAGAAW">NNAGAAW</option>
             <option value="NAAAAC">NAAAAC</option>      
         </param>
-
-
-          <param name="target_size" type="select" label="Target size">
+        <param name="target_size" type="select" label="Target size">
             <option value="18">18</option>
  	    <option value="19">19</option>
             <option value="20" selected="true">20</option>
             <option value="21">21</option>
         </param>
+        <param name="totalMM" type="integer" value="4" label="Number of total maximum mismatches allowed in the off-target sites" />
+        <param name="coreLength" type="integer" value="12" label="Number of bases that enclose the core of the target site"/>
+        <param name="maxOT" type="integer" optional="True" label="Maximum number of off-target sites to be reported (Reports all if this value is not set)"/>
+        <param name="exonsFile" type="data" format="bed" metadata_name="dbkey" label="Pseudo-bed file containing the coordinate of exons in the target genome" default="None"  />
+        <param name="genesFile" type="data" format="bed" metadata_name="dbkey" label="Pseudo-bed file containing the coordinate of genes in the target genome" default="None"/>
 
-
+        <param name="out_format" type="select" label="Select the output format(s)" multiple="true" display="checkboxes">
+            <option value="bed" selected="True">Bed</option>
+            <option value="fasta" selected="True">FASTA</option>
+            <option value="xls" selected="True">xls</option>
+        </param>
     </inputs>
    
 
@@ -70,14 +74,16 @@
     <outputs>
         <collection name="xls_output" type="list" label="CCTop results ${on_string} - xls format">
             <discover_datasets pattern="(?P&lt;designation&gt;.+)\.xls" directory="." format='xls'/>
+            <filter>'xls' in out_format</filter>
         </collection>
         <collection name="fasta_output" type="list" label="CCTop results ${on_string} - fasta format">
             <discover_datasets pattern="(?P&lt;designation&gt;.+)\.fasta" directory="." format='fasta'/>
+            <filter>'fasta' in out_format</filter>
         </collection>
         <collection name="bed_output" type="list" label="CCTop results ${on_string} - bed format">
             <discover_datasets pattern="(?P&lt;designation&gt;.+)\.bed" directory="." format='bed'/>
+            <filter>'bed' in out_format</filter>
         </collection>
-
     </outputs>
     
 
