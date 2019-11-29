@@ -2,6 +2,7 @@
     <description>CCTop - CRISPR/Cas9 Target predictor</description>
     <requirements>
         <requirement type="package">bowtie</requirement>
+        <requirement type="package" version="0.7.1">bx-python</requirement>
     </requirements>
 <command><![CDATA[
 which python;
@@ -23,6 +24,10 @@ $__tool_directory__/CCTop.py
 --input $input_sequences 
 --targetSize $target_size.value
 --totalMM $totalMM
+#if $genesFile and $exonsFile:
+    --genesFile $genesFile
+    --exonsFile $exonsFile
+#end if
 ]]></command>
 
     <inputs>
@@ -52,15 +57,15 @@ $__tool_directory__/CCTop.py
         </param>
         <param name="target_size" type="select" label="Target size">
             <option value="18">18</option>
- 	    <option value="19">19</option>
+            <option value="19">19</option>
             <option value="20" selected="true">20</option>
             <option value="21">21</option>
         </param>
         <param name="totalMM" type="integer" value="4" label="Number of total maximum mismatches allowed in the off-target sites" />
         <param name="coreLength" type="integer" value="12" label="Number of bases that enclose the core of the target site"/>
         <param name="maxOT" type="integer" optional="True" label="Maximum number of off-target sites to be reported (Reports all if this value is not set)"/>
-        <param name="exonsFile" type="data" format="bed" metadata_name="dbkey" label="Pseudo-bed file containing the coordinate of exons in the target genome" default="None"  />
-        <param name="genesFile" type="data" format="bed" metadata_name="dbkey" label="Pseudo-bed file containing the coordinate of genes in the target genome" default="None"/>
+        <param name="exonsFile" type="data" format="bed" metadata_name="dbkey" optional="True" label="Pseudo-bed file containing the coordinate of exons in the target genome" default="None"  />
+        <param name="genesFile" type="data" format="bed" metadata_name="dbkey" optional="True" label="Pseudo-bed file containing the coordinate of genes in the target genome" default="None"/>
 
         <param name="out_format" type="select" label="Select the output format(s)" multiple="true" display="checkboxes">
             <option value="bed" selected="True">Bed</option>
