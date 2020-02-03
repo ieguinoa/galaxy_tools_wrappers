@@ -1,11 +1,10 @@
-<tool id="cctop" name="CCTop" version="0.1">
+<tool id="cctop" name="CCTop" version="0.2">
     <description>CCTop - CRISPR/Cas9 Target predictor</description>
     <requirements>
         <requirement type="package">bowtie</requirement>
         <requirement type="package" version="0.7.1">bx-python</requirement>
     </requirements>
-<command><![CDATA[
-which python;
+<command detect_errors="exit_code"><![CDATA[
 bowtie_bin=`which bowtie`;
 bowtie_dir=`dirname \$bowtie_bin`;
 #if $input_files.genome_source != 'built-in':
