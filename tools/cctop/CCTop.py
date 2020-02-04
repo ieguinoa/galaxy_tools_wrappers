@@ -214,6 +214,7 @@ class Offtarget:
                 continue
             self.score = self.score + pow(1.2, idx - lengthPAM + 1)
             self.alignment[idx - lengthPAM] = '-'
+        #ieguinoa fix
         # if coreRange > 0 and coreRange != "NA":
             # self.alignment = "PAM[" + "".join(self.alignment[:coreRange]) + "]" + "".join(self.alignment[coreRange:])
         # else:
@@ -275,7 +276,6 @@ class Offtarget:
        
     def setGeneInfo(self, exons, genes):
         closest = exons.closest(self.chromosome, self.start, self.end)
-        
         self.geneID = closest[0]
         self.geneName = closest[1]
         self.distance = closest[2]
